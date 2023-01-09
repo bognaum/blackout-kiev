@@ -147,6 +147,16 @@
 		</tbody>
 	</table>
 	<script type="text/javascript">
+
+		const 
+			qS = window.location.search.slice(1),
+			qPares = qS.split("&"),
+			qPare = qPares.find((v) => {
+				const [key, value] = v.split("=");
+				return key === "g";
+			}),
+			[nothing, groupN] = qPare.split("=");
+		console.log(`groupN >>`, groupN);
 		
 		tbody.innerHTML += generateHtml(0, 0);
 		tbody.innerHTML += generateHtml(-3, 0);
