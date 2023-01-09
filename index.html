@@ -103,6 +103,16 @@
 			margin: 0;
 			padding: 0;
 		}
+		nav {
+			/*margin: auto;*/
+			text-align: center;
+			display: block;
+		}
+		nav a {
+			display: inline-block;
+			padding: 10px 20px;
+		}
+		nav a {}
 		table {
 			margin: auto;
 			--dark-bg: #ccc;
@@ -137,16 +147,27 @@
 	<title>Blackout Kiev Group 2</title>
 </head>
 <body>
+	<nav>
+		<a href="?g=1">Группа - 1</a>
+		<a href="?g=2">Группа - 2</a>
+		<a href="?g=3">Группа - 3</a>
+	</nav>
 	<table border="" cellpadding="5" cellspacing="0">
 		<tbody id="tbody">
 			<tr>
 				<td class="ta-c" colspan="26">
-					<p>Киев. Группа - 2</p>
+					<p id="table_header"></p>
 				</td>
 			</tr>
 		</tbody>
 	</table>
 	<script type="text/javascript">
+		const groupSettings = [
+			[],
+			[0 , 0],
+			[-3, 0],
+			[-6, 0],
+		];
 
 		const 
 			qS = window.location.search.slice(1),
@@ -156,11 +177,17 @@
 				return key === "g";
 			}),
 			[nothing, groupN] = qPare.split("=");
-		console.log(`groupN >>`, groupN);
+		// console.log(`groupN >>`, groupN);
+
+		if (groupN) {
+			const sts = groupSettings[parseInt(groupN)];
+			table_header.textContent = `Киев. Группа - ${groupN}`;
+			tbody.innerHTML += generateHtml(...sts);
+		}
 		
-		tbody.innerHTML += generateHtml(0, 0);
-		tbody.innerHTML += generateHtml(-3, 0);
-		tbody.innerHTML += generateHtml(-6, 0);
+		// tbody.innerHTML += generateHtml(0, 0);
+		// tbody.innerHTML += generateHtml(-3, 0);
+		// tbody.innerHTML += generateHtml(-6, 0);
 
 		function generateHtml(onOffOffset=0, dayHourOffset=0) {
 			const 
