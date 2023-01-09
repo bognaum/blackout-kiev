@@ -148,9 +148,9 @@
 	</table>
 	<script type="text/javascript">
 		
-		tbody.innerHTML += generateHtml(5, 0);
-		tbody.innerHTML += generateHtml(2, 0);
-		tbody.innerHTML += generateHtml(-1, 0);
+		tbody.innerHTML += generateHtml(0, 0);
+		tbody.innerHTML += generateHtml(-3, 0);
+		tbody.innerHTML += generateHtml(-6, 0);
 
 		function generateHtml(onOffOffset=0, dayHourOffset=0) {
 			const 
@@ -254,15 +254,15 @@
 		
 		function * OnOffSeq(offset=0) {
 			const seq = [
+				"-",
+				"-",
+				"-",
+				"-",
 				"+",
 				"+",
 				"?",
 				"?",
 				"?",
-				"-",
-				"-",
-				"-",
-				"-",
 			];
 			let n = 0;
 			if (seq.length === 0) {
