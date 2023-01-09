@@ -150,7 +150,7 @@
 		
 		tbody.innerHTML += generateHtml(5, 0);
 		tbody.innerHTML += generateHtml(2, 0);
-		tbody.innerHTML += generateHtml(-1 + 9, 0);
+		tbody.innerHTML += generateHtml(-1, 0);
 
 		function generateHtml(onOffOffset=0, dayHourOffset=0) {
 			const 
@@ -265,6 +265,9 @@
 				"-",
 			];
 			let n = 0;
+			if (seq.length === 0) {
+				return;
+			}
 			while (offset < 0) {
 				offset += seq.length;
 			}
@@ -280,6 +283,9 @@
 		}
 		function * DayHourSeq(offset=0) {
 			let n = 0;
+			while (offset < 0) {
+				offset += 24;
+			}
 			while (true) {
 				for (let day = 0; day < 7; day++) {
 					for (let hour = 0; hour < 24; hour++) {
