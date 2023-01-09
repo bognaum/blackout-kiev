@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="--UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		table {
+		  counter-reset: trn trn-0 trn-1 trn-2 trn-3 trn-4 trn-5;
+		}
+		table .trn,
+		table .trn-0,
+		table .trn-1,
+		table .trn-2,
+		table .trn-3,
+		table .trn-4,
+		table .trn-5 {
+		  text-align: center;
+		}
+		table .trn:before,
+		table .trn-0:before,
+		table .trn-1:before,
+		table .trn-2:before,
+		table .trn-3:before,
+		table .trn-4:before,
+		table .trn-5:before {
+		  display: inline-block;
+		}
+		table .trn:before {
+		  content: counter(trn);
+		  counter-increment: trn;
+		}
+		table .trn-0:before {
+		  content: counter(trn-0);
+		  counter-increment: trn-0;
+		}
+		table .trn-1:before {
+		  content: counter(trn-1);
+		  counter-increment: trn-1;
+		}
+		table .trn-2:before {
+		  content: counter(trn-2);
+		  counter-increment: trn-2;
+		}
+		table .trn-3:before {
+		  content: counter(trn-3);
+		  counter-increment: trn-3;
+		}
+		table .trn-4:before {
+		  content: counter(trn-4);
+		  counter-increment: trn-4;
+		}
+		table .trn-5:before {
+		  content: counter(trn-5);
+		  counter-increment: trn-5;
+		}
+		table .ta-l {
+		  text-align: left;
+		}
+		table .ta-c {
+		  text-align: center;
+		}
+		table .ta-r {
+		  text-align: right;
+		}
+		
+		table.fun-descr {
+		  border-collapse: collapse;
+		  text-align: center;
+		}
+		table.fun-descr th,
+		table.fun-descr td {
+		  border: 1px solid #ddd;
+		  padding: 3px 10px;
+		}
+		table.fun-descr th {
+		  color: #aaa;
+		  background-color: #ddd;
+		}
+		table.fun-descr td:nth-last-child(1) {
+		  text-align: left;
+		}
+		table.fun-descr ol,
+		table.fun-descr ul {
+		  text-align: left;
+		}
+		table.fun-descr ul {
+		  list-style-type: "- ";
+		}
+		table.fun-descr details summary {
+		  display: inline-block;
+		  cursor: pointer;
+		  border: 1px solid #aaa;
+		  box-shadow: inset 0 0 10px #aaa;
+		  margin: 5px 0;
+		}
+		table.fun-descr details summary:after {
+		  content: " ‧ ‧ ‧ ";
+		}
+	</style>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		table {
+			margin: auto;
+			--dark-bg: #ccc;
+		}
+		td {}
+		div.hour-number {
+			text-align: center;
+			width: 20px;
+			padding: 5px 0;
+			background-color: #fff;
+			transform: translate(-17px, 0px);
+		}
+		td[data-state] {
+			white-space: nowrap;
+		}
+		td[data-state="+"] {
+			background-color: #fff;
+		}
+		td[data-state="-"] {
+			background-color: var(--dark-bg);
+		}
+		td[data-state="?"] {
+			background: linear-gradient(90deg, #fff 0, #fff 40%, var(--dark-bg) 60%, var(--dark-bg) 100%);
+		}
+		td[data-state].actual-interval {
+			border: 4px solid #f00;
+			transform: scale(1.1);
+			padding: 0;
+			font-weight: bold;
+		}
+	</style>
+	<title>Blackout Kiev Group 2</title>
+</head>
+<body>
+	<table border="" cellpadding="5" cellspacing="0">
+		<tbody id="tbody">
+			<tr>
+				<td class="ta-c" colspan="26">
+					<p>Киев. Группа - 2</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<script type="text/javascript">
+		
+		tbody.innerHTML += generateHtml(2, 0);
+
+		function generateHtml(onOffOffset=0, dayHourOffset=0) {
+			const 
+				onOffSeq = OnOffSeq(onOffOffset),
+				dayHourSeq = DayHourSeq(dayHourOffset),
+				dayHourModel = [ [], [], [], [], [], [], [], ],
+				dayNames = [
+					"Понедельник",
+					"Вторник",
+					"Среда",
+					"Четверг",
+					"Пятница",
+					"Суббота",
+					"Воскресенье",
+				];
+			let html = '';
+
+			// Создаём почасовую модель на неделю:
+			for (let hour = 0; hour < 24 * 7; hour++) {
+				const 
+					m = dayHourModel,
+					[d,h] = dayHourSeq.next().value,
+					status = onOffSeq.next().value;
+				m[d][h] = status;
+			}
+
+			// Объединяем часы с одинаковым статусом в интервалы:
+			const mergedModel = dayHourModel.map(day => {
+				return day.reduce((acc, v, i, a) => {
+					const current = last(acc);
+					if (current) {
+						if (current?.status === v) {
+							current.len += 1;
+							current.fromTo[1] += 1;
+							current.to += 1;
+						} else {
+							acc.push(makeIntervalModel(v, i));
+						}
+					} else {
+						acc.push(makeIntervalModel(v, 0));
+					}
+					return acc;
+				}, []);
+			});
+			
+			for (let i = 0; i < mergedModel.length; i++) {
+				const 
+					el = mergedModel[i],
+					prev = mergedModel[i - 1] || last(mergedModel),
+					next = mergedModel[i + 1] || mergedModel[0];
+			
+				if (last(prev).status === el[0].status) {
+					last(prev).to = el[0].from = "";
+				} else {}
+					
+				if (last(el).status === next[0].status) {
+					last(el).to = next[0].from = "";
+				} else {}
+			}
+			
+			// Создаём ряд с нумерацией часов:
+			html += `<td colspan="2"></td>`;
+			for (let i = 0; i < 24; i++) {
+				html += `<td><div class="hour-number">${ i }</div></td>`;
+			}
+
+			// создаём ряды, соответствующие дням недели:
+			for (const [dayI, day]of mergedModel.entries()) {
+				html += `
+					<tr data-week-day="${ dayI + 1 }">
+						<td class="trn"></td>
+						<td class="ta-r">${ dayNames[dayI] }</td>
+				`;
+				for (const [intervalI, interval]of day.entries()) {
+					html += `
+						<td
+							class="ta-c"
+							colspan="${ interval.len }"
+							data-state="${ interval.status }"
+							data-from-to="[${ interval.fromTo.toString() }]"
+						>${ interval.from }..${ interval.to }</td>
+					`;
+				}
+				html += `
+					</tr>
+				`;
+			}
+			
+			return html;
+		}
+
+		function makeIntervalModel(status, hour) {
+			return {
+				status,
+				len: 1,
+				fromTo: [hour, hour + 1],
+				from: hour,
+				to: hour + 1,
+			};
+		}
+		
+		function * OnOffSeq(offset=0) {
+			const seq = [
+				"+",
+				"+",
+				"?",
+				"?",
+				"?",
+				"-",
+				"-",
+				"-",
+				"-",
+			];
+			let n = 0;
+			while (true) {
+				for (const v of seq) {
+					if (n < offset) {
+						n++;
+					} else {
+						yield v;
+					}
+				}
+			}
+		}
+		function * DayHourSeq(offset=0) {
+			let n = 0;
+			while (true) {
+				for (let day = 0; day < 7; day++) {
+					for (let hour = 0; hour < 24; hour++) {
+						if (n < offset) {
+							n++;
+						} else {
+							yield [day, hour];
+						}
+					}
+				}
+			}
+		}
+		function last(array) {
+			return array[array.length - 1];
+		}
+	</script>
+	<script type="text/javascript">
+
+		window.addEventListener("load", (ev) => {
+			setTimeout(() => {
+				const actualInterval = selectActualInterval();
+				actualInterval.scrollIntoView({
+					smooth: true, 
+					block: "center",
+					inline: "center",
+				});
+			})
+		});
+		window.addEventListener("focus", selectActualInterval);
+
+		function selectActualInterval(ev) {
+			console.log("OK");
+			const 
+				ACTUAL_INTERVAL_C_N = "actual-interval",
+				date = new Date(),
+				weekDay = date.getDay() || 7,
+				// hours = 13;
+				hours = date.getHours();
+			const 
+				actualRow = document.querySelector(`[data-week-day="${weekDay}"]`),
+				intervals = [...actualRow.querySelectorAll("[data-state]")],
+				actualInterval = intervals.find((v) => {
+					const [from, to] = JSON.parse(v.dataset.fromTo);
+					return from <= hours && hours < to;
+				});
+			document.querySelectorAll("."+ACTUAL_INTERVAL_C_N).forEach((v) => {
+				v.classList.remove(ACTUAL_INTERVAL_C_N);
+			});
+			actualInterval.classList.add(ACTUAL_INTERVAL_C_N);
+			return actualInterval;
+		}
+	</script>
+</body>
+</html>
