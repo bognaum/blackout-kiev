@@ -112,7 +112,10 @@
 			display: inline-block;
 			padding: 10px 20px;
 		}
-		nav a {}
+		nav a:target {
+			background-color: #333;
+			color: #fff;
+		}
 		table {
 			margin: auto;
 			--dark-bg: #ccc;
@@ -156,7 +159,7 @@
 		<tbody id="tbody">
 			<tr>
 				<td class="ta-c" colspan="26">
-					<p id="table_header"></p>
+					<p id="table_header">Выберите нужную Вам группу.</p>
 				</td>
 			</tr>
 		</tbody>
